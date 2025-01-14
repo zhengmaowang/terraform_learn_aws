@@ -2,6 +2,15 @@ provider "aws" {
 region = "ap-southeast-2"
 }
 
+data "terraform_remote_state" "db" {
+  backend = "s3"
+  config = {
+    bucket = "terraform-aws-state-sandbox"
+    key = "stage/data-stores/mysql/terraform.tfstate"
+    region = "ap-southeast-2"
+ }
+}
+
 resource "aws_launch_configuration" "example" {
 image_id         = "ami-002aaaf5ff99b864b"
 instance_type    = "t2.micro"
@@ -13,6 +22,8 @@ user_data = <<-EOF
             sudo systemctl start apache2
             sudo systemctl enable apache2            
             sudo echo '<center><h1>This Apache Web Server is Running on an AWS EC2 Instance </h1></center>' > /var/www/html/index.html
+            sudo echo '${data.terraform_remote_state.db.outputs.address}' >> /var/www/html/index.html
+            sudo echo '${data.terraform_remote_state.db.outputs.port}' >> /var/www/html/index.html
             sudo systemctl restart apache2
             sudo ufw disable
             EOF

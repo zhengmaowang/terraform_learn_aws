@@ -1,7 +1,3 @@
-variable "db_password" {
-  description = "The password for the database"
-  type = string
-}
 variable "db_remote_state_bucket" {
   description = "the name of the s3 bucket for the database's remote state"
   type = string
